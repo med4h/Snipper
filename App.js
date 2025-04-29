@@ -2,13 +2,13 @@ const express = require('express');
 const connectDB = require('./db');
 const Snippet = require('./models/Snippet');
 
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
 connectDB();
 app.use(express.json());
 
-// add/create new snippet
+// Add/create new snippet
 app.post('/snippets', async (req, res) => {
     try {
         const { language, code } = req.body;
@@ -16,21 +16,23 @@ app.post('/snippets', async (req, res) => {
         await snippet.save();
         res.status(201).json(snippet);
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: err.message });
     }
 });
 
-// get all snippets currently in data store
+// Get all snippets or filter by language
 app.get('/snippets', async (req, res) => {
     try {
-        const snippets = await Snippet.find();
+        const { lang } = req.query; // Check for query parameter
+        const filter = lang ? { language: lang } : {}; // Filter by language if provided
+        const snippets = await Snippet.find(filter);
         res.json(snippets);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// get snippet by id
+// Get snippet by ID
 app.get('/snippets/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -44,24 +46,11 @@ app.get('/snippets/:id', async (req, res) => {
     }
 });
 
-//get snippets by language 
-app.get('/snippets', async (req, res) => {
-    try {
-        const { lang } = req.query;
-        const filter = lang ? { language : lang } :{};
-        const snippets = await Snippet.find(filter);
-        res.json(snippets);
-    } catch (err) {
-        res.status(500).json({ error: err.message })
-    }
-})
-
-
-
+// Root endpoint
 app.get('/', (req, res) => {
-  res.send('Snipper Project!')
-})
+    res.send('Snipper Project!');
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+    console.log(`Example app listening on port ${port}`);
+});
