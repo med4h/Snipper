@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
+
 const SnippetSchema = new mongoose.Schema({
     _id: { type: Number }, // Explicitly allow _id to be a Number
     language: { type: String, required: true },
