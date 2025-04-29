@@ -11,7 +11,8 @@ const seedDatabase = async () => {
       await Snippet.deleteMany();
   
       // Insert seed data
-      await Snippet.insertMany(seedData.map(({ id, ...rest }) => rest)); // Exclude `id` field
+      const formattedData = seedData.map(({ id, ...rest }) => ({ _id: id, ...rest}));
+      await Snippet.insertMany(formattedData) // keep seedData ID instead of Mongo unique _id
       console.log('Database seeded successfully!');
   
       // Close the connection
