@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const SnippetSchema = new mongoose.Schema({
-    _id: { type: Number },
-    language: { type: String, required: true }, 
+    _id: { type: Number }, // Explicitly allow _id to be a Number
+    language: { type: String, required: true },
     code: { type: String, required: true },
 });
 

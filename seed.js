@@ -5,22 +5,23 @@ const connectDB = require('./db');
 
 const seedDatabase = async () => {
     try {
-      await connectDB();
-  
-      // Clear existing data
-      await Snippet.deleteMany();
-  
-      // Insert seed data
-      const formattedData = seedData.map(({ id, ...rest }) => ({ _id: id, ...rest}));
-      await Snippet.insertMany(formattedData) // keep seedData ID instead of Mongo unique _id
-      console.log('Database seeded successfully!');
-  
-      // Close the connection
-      mongoose.connection.close();
+        await connectDB();
+
+        // Clear existing data
+        await Snippet.deleteMany();
+
+        // Insert seed data with _id mapped from id
+        const formattedData = seedData.map(({ id, ...rest }) => ({ _id: id, ...rest }));
+        await Snippet.insertMany(formattedData); // Use _id from seedData
+
+        console.log('Database seeded successfully!');
+
+        // Close the connection
+        mongoose.connection.close();
     } catch (err) {
-      console.error('Error seeding the database:', err.message);
-      process.exit(1);
+        console.error('Error seeding the database:', err.message);
+        process.exit(1);
     }
-  };
-  
-  seedDatabase();
+};
+
+seedDatabase();

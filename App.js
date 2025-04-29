@@ -34,13 +34,13 @@ app.get('/snippets', async (req, res) => {
 app.get('/snippets/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const snippet = await Snippet.findById(id);
-     if (!snippet) {
-        return res. status(404).json({ error: 'Snippet not found'});
-     }
-     res.json(snippet);
+        const snippet = await Snippet.findById(id); // Query by _id
+        if (!snippet) {
+            return res.status(404).json({ error: 'Snippet not found' });
+        }
+        res.json(snippet);
     } catch (err) {
-        res.status(404).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
