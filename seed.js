@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Snippet = require('./models/Snippet');
+const { Snippet, encrypt } = require('./models/Snippet'); // Import Snippet and encrypt
 const seedData = require('./seedData.json');
 const connectDB = require('./db');
 
@@ -8,10 +8,14 @@ const seedDatabase = async () => {
         await connectDB();
 
         // Clear existing data
-        await Snippet.deleteMany();
+        await Snippet.deleteMany(); // Correctly call deleteMany on the Snippet model
 
         // Insert seed data with _id mapped from id
-        const formattedData = seedData.map(({ id, ...rest }) => ({ _id: id, ...rest }));
+        const formattedData = seedData.map(({ id, ...rest }) => ({
+            _id: id,
+            ...rest,
+            code: encrypt(rest.code), // Encrypt the code before inserting
+        }));
         await Snippet.insertMany(formattedData); // Use _id from seedData
 
         console.log('Database seeded successfully!');
