@@ -2,6 +2,16 @@ const mongoose = require('mongoose');
 const { Snippet, encrypt } = require('./models/Snippet'); // Import Snippet and encrypt
 const seedData = require('./seedData.json');
 const connectDB = require('./db');
+const Counter = require('./models/Counter');
+
+const initializeCounter = async () => {
+    const highestId = Math.max(...seedData.map((snippet) => snippet.id));
+    await Counter.findByIdAndUpdate(
+        { _id: 'snippetId' },
+        {$set: { seq: highestId }},
+        { upsert: true }
+    );
+};
 
 const seedDatabase = async () => {
     try {

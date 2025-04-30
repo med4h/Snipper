@@ -1,6 +1,6 @@
 const express = require('express');
 const connectDB = require('./db');
-const Snippet = require('./models/Snippet');
+const { Snippet } = require('./models/Snippet');
 
 const app = express();
 const port = 3000;

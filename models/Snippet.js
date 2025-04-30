@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const Counter = require('./Counter');
 
 const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
 const IV_LENGTH = 16;
@@ -31,11 +32,18 @@ const SnippetSchema = new mongoose.Schema({
     code: { type: String, required: true },
 });
 
-SnippetSchema.pre('save', function (next) {
+SnippetSchema.pre('save', async function (next) {
+    if (this.isNew) {
+        // Get the next value from the counter
+        const counter = await Counter.findByIdAndUpdate(
+            { _id: 'snippetId' }, // Counter name
+            { $inc: { seq: 1 } }, // Increment the counter
+            { new: true, upsert: true } // Create the counter if it doesn't exist
+        );
+        this._id = counter.seq; // Assign the incremented value to _id
+    }
     if (this.isModified('code')) {
-        console.log('Original Code:', this.code);
         this.code = encrypt(this.code);
-        console.log('Encrypted Code:', this.code);
     }
     next();
 });
