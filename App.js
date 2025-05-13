@@ -6,8 +6,20 @@ const User = require('./models/User')
 const app = express();
 const port = 3000;
 
+const
+
 connectDB();
-app.use(express.json());
+app.use(express.json()); authenticateUser = async (email, password) => {
+    const user = await User.findoNE ({ email });
+    if (!user) {
+        throw new Error('Invalid email or password');
+    }
+    const isMatch = await user.comparePassword(password);
+    if(!isMatch) {
+        throw new Error('Invalid email or Password');
+    }
+    return user;
+};
 
 app.post('/user', async (req, res) => {
     try {
@@ -19,6 +31,17 @@ app.post('/user', async (req, res) => {
         res.status(500).json({ error: err.message })
     }
 });
+
+app.get('/user', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await authenticateUser(email, password);
+        const { password: _, ...userData } = user.toObject();
+        res.json(userData);
+        } catch (err) {
+            res.status(401).json({ error: err.message });
+        }
+})
 
 // Add/create new snippet
 app.post('/snippets', async (req, res) => {
