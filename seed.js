@@ -22,7 +22,6 @@ const seedDatabase = async () => {
 
         // Insert seed data with _id mapped from id
         const formattedData = seedData.map(({ id, ...rest }) => ({
-            _id: id,
             ...rest,
             code: encrypt(rest.code), // Encrypt the code before inserting
         }));
