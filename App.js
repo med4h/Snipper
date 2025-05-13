@@ -1,12 +1,24 @@
 const express = require('express');
 const connectDB = require('./db');
 const { Snippet } = require('./models/Snippet');
+const User = require('./models/User')
 
 const app = express();
 const port = 3000;
 
 connectDB();
 app.use(express.json());
+
+app.post('/user', async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        const user = new User({ username, email, password }); 
+        await user.save();
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message })
+    }
+});
 
 // Add/create new snippet
 app.post('/snippets', async (req, res) => {
