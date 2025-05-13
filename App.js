@@ -2,6 +2,7 @@ const express = require('express');
 const connectDB = require('./db');
 const { Snippet } = require('./models/Snippet');
 const User = require('./models/User')
+const Counter = require('./modles/Counter');
 
 const app = express();
 const port = 3000;
@@ -47,7 +48,12 @@ app.get('/user', async (req, res) => {
 app.post('/snippets', async (req, res) => {
     try {
         const { language, code } = req.body;
-        const snippet = new Snippet({ language, code });
+        const counter = await Counter.findByIdAndUpdate(
+            { _id: 'snippetId' },
+            { $inc: {seq: 1 }},
+            { new: true, upsert: true }
+        );
+        const snippet = new Snippet({ _id: counter.seq, language, code });
         await snippet.save();
         res.status(201).json(snippet);
     } catch (err) {
