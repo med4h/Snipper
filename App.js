@@ -6,20 +6,20 @@ const User = require('./models/User')
 const app = express();
 const port = 3000;
 
-const
-
-connectDB();
-app.use(express.json()); authenticateUser = async (email, password) => {
+const authenticateUser = async (email, password) => {
     const user = await User.findoNE ({ email });
     if (!user) {
         throw new Error('Invalid email or password');
     }
     const isMatch = await user.comparePassword(password);
     if(!isMatch) {
-        throw new Error('Invalid email or Password');
+        throw new Error('Invalid email or Password')
     }
     return user;
-};
+}
+
+connectDB();
+app.use(express.json());
 
 app.post('/user', async (req, res) => {
     try {
