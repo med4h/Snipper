@@ -3,6 +3,8 @@ const connectDB = require('./db');
 const { Snippet } = require('./models/Snippet');
 const User = require('./models/User')
 const Counter = require('./modles/Counter');
+const bcrypt = require('bcrypt');
+
 
 const app = express();
 const port = 3000;

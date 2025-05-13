@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bycrypt = require('bycrypt');
+const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 10;
 
@@ -12,13 +12,13 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
-        const salt = await bycrypt.genSalt(SALT_ROUNDS);
-        this.password = await bycrypt.hash(this.password, salt);
+        const salt = await bcrypt.genSalt(SALT_ROUNDS);
+        this.password = await bcrypt.hash(this.password, salt);
     }
     next();
 });
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-    return bycrypt.compare(candidatePassword, this.password);
+    return bcrypt.compare(candidatePassword, this.password);
 }
 module.exports = mongoose.model('User', UserSchema);
