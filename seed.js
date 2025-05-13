@@ -5,10 +5,9 @@ const connectDB = require('./db');
 const Counter = require('./models/Counter');
 
 const initializeCounter = async () => {
-    const highestId = Math.max(...seedData.map((snippet) => snippet.id));
     await Counter.findByIdAndUpdate(
         { _id: 'snippetId' },
-        {$set: { seq: highestId }},
+        {$set: { seq: 0 }},
         { upsert: true }
     );
 };
@@ -17,19 +16,22 @@ const seedDatabase = async () => {
     try {
         await connectDB();
 
-        // Clear existing data
-        await Snippet.deleteMany(); // Correctly call deleteMany on the Snippet model
+        // Initialize the counter
+        await initializeCounter();
 
-        // Insert seed data with _id mapped from id
-        const formattedData = seedData.map(({ id, ...rest }) => ({
-            ...rest,
-            code: encrypt(rest.code), // Encrypt the code before inserting
-        }));
-        await Snippet.insertMany(formattedData); // Use _id from seedData
+        // Clear existing data
+        await Snippet.deleteMany();
+
+        // Insert seed data
+        for (const { id, ...rest } of seedData) {
+            const snippet = new Snippet({
+                ...rest,
+                code: encrypt(rest.code),
+            });
+            await snippet.save(); // This triggers the pre('save') middleware
+        }
 
         console.log('Database seeded successfully!');
-
-        // Close the connection
         mongoose.connection.close();
     } catch (err) {
         console.error('Error seeding the database:', err.message);

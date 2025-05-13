@@ -27,17 +27,17 @@ const decrypt = (encryptedText) => {
 };
 
 const SnippetSchema = new mongoose.Schema({
+    _id: { type: Number },
     language: { type: String, required: true },
     code: { type: String, required: true },
 });
 
 SnippetSchema.pre('save', async function (next) {
-    if (this.isNew) {
-        // Get the next value from the counter
+    if (this.isNew && !this._id) {
         const counter = await Counter.findByIdAndUpdate(
-            { _id: 'snippetId' }, // Counter name
-            { $inc: { seq: 1 } }, // Increment the counter
-            { new: true, upsert: true } // Create the counter if it doesn't exist
+            { _id: 'snippetId' },
+            { $inc: { seq: 1 } },
+            { new: true, upsert: true }
         );
         this._id = counter.seq; // Assign the incremented value to _id
     }
@@ -49,8 +49,10 @@ SnippetSchema.pre('save', async function (next) {
 
 SnippetSchema.set('toJSON', {
     transform: (doc, ret) => {
-        ret.code = decrypt(ret.code);
-        delete ret.__v;
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v; 
+        ret.code = decrypt(ret.code); 
         return ret;
     },
 });
