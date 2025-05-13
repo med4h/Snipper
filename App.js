@@ -10,16 +10,16 @@ const app = express();
 const port = 3000;
 
 const authenticateUser = async (email, password) => {
-    const user = await User.findoNE ({ email });
+    const user = await User.findOne({ email }); // Fix: Pass email as an object
     if (!user) {
         throw new Error('Invalid email or password');
     }
     const isMatch = await user.comparePassword(password);
-    if(!isMatch) {
-        throw new Error('Invalid email or Password')
+    if (!isMatch) {
+        throw new Error('Invalid email or password');
     }
     return user;
-}
+};
 
 connectDB();
 app.use(express.json());
@@ -39,11 +39,13 @@ app.get('/user', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await authenticateUser(email, password);
-        const { password: _, ...userData } = user.toObject();
-        res.json(userData);
-        } catch (err) {
-            res.status(401).json({ error: err.message });
-        }
+
+        // Return only username and email
+        const { username, email: userEmail } = user.toObject();
+        res.json({ username, email: userEmail });
+    } catch (err) {
+        res.status(401).json({ error: err.message });
+    }
 })
 
 // Add/create new snippet
