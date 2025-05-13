@@ -41,7 +41,7 @@ SnippetSchema.pre('save', async function (next) {
         );
         this._id = counter.seq; // Assign the incremented value to _id
     }
-    if (this.isModified('code')) {
+    if (this.isNew || this.isModified('code')) {
         this.code = encrypt(this.code);
     }
     next();

@@ -26,7 +26,6 @@ const seedDatabase = async () => {
         for (const { id, ...rest } of seedData) {
             const snippet = new Snippet({
                 ...rest,
-                code: encrypt(rest.code),
             });
             await snippet.save(); // This triggers the pre('save') middleware
         }
